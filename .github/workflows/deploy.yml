@@ -1,0 +1,23 @@
+name: CD - Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-ssh:
+    name: Test SSH connection
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${{ secrets.VM_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Test connection to VM
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            "${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}" \
+            "echo 'SSH connection successful' && whoami && docker --version"
