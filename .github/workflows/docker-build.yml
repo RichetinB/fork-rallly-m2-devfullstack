@@ -1,0 +1,33 @@
+name: CI - Docker Build
+
+on:
+  push:
+    branches:
+      - infra/cicd
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  docker-build:
+    name: Build Rallly image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Rallly Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/web/Dockerfile
+          push: false
+          build-args: |
+            SELF_HOSTED=true
